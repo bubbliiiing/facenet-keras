@@ -14,7 +14,7 @@
 | 训练数据集 | 权值文件名称 | 测试数据集 | 输入图片大小 | mAP 0.5:0.95 |
 | :-----: | :-----: | :------: | :------: | :------: |
 | CASIA-WebFace | [facenet_mobilenet.h5](https://github.com/bubbliiiing/facenet-keras/releases/download/v1.0/facenet_mobilenet.h5) | LFW | 160x160 | 97.86% |
-| CASIA-WebFace | [facenet_inception_resnetv1.h5](https://github.com/bubbliiiing/facenet-keras/releases/download/v1.0/facenet_inception_resnetv1.h5) | LFW | 160x160 | 46.4 |
+| CASIA-WebFace | [facenet_inception_resnetv1.h5](https://github.com/bubbliiiing/facenet-keras/releases/download/v1.0/facenet_inception_resnetv1.h5) | LFW | 160x160 | 99.02% |
 
 ## 所需环境
 tensorflow-gpu==1.13.1  
