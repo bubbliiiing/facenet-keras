@@ -29,12 +29,16 @@ keras==2.1.5
 
 ## 预测步骤
 ### a、使用预训练权重
-1. 下载完库后解压，在百度网盘下载facenet_mobilenet.h5或者facenet_inception_resnetv1.h5，放入model_data，运行predict.py，输入：
+1. 下载完库后解压，在model_data文件夹里已经有了facenet_mobilenet.h5，可直接运行predict.py输入：
 ```python
 img\1_001.jpg
 img\1_002.jpg
 ```  
-
+2. 也可以在百度网盘下载facenet_inception_resnetv1.h5，放入model_data，修改facenet.py文件的model_path后，输入：
+```python
+img\1_001.jpg
+img\1_002.jpg
+```  
 ### b、使用自己训练的权重
 1. 按照训练步骤训练。  
 2. 在facenet.py文件里面，在如下部分修改model_path和backbone使其对应训练好的文件；**model_path对应logs文件夹下面的权值文件，backbone对应主干特征提取网络**。  
