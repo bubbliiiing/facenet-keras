@@ -1,15 +1,8 @@
-import os
-
-import keras
 import numpy as np
-from keras.callbacks import (EarlyStopping, ModelCheckpoint, ReduceLROnPlateau,
-                             TensorBoard)
-from keras.optimizers import SGD, Adam
 
 from nets.facenet import facenet
-from nets.facenet_training import triplet_loss
-from utils.eval_metrics import evaluate
-from utils.LFWdataset import LFWDataset
+from nets.facenet_training import LFWDataset
+from utils.utils_metrics import evaluate
 
 
 def accuracy(output, target, topk=(1,)):
@@ -56,7 +49,7 @@ def plot_roc(fpr,tpr,figure_name="roc.png"):
     from sklearn.metrics import auc, roc_curve
     roc_auc = auc(fpr, tpr)
     fig = plt.figure()
-    lw = 2
+    lw  = 2
     plt.plot(fpr, tpr, color='darkorange',
              lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
     plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
@@ -71,22 +64,27 @@ def plot_roc(fpr,tpr,figure_name="roc.png"):
 if __name__ == "__main__":
     #--------------------------------------#
     #   主干特征提取网络的选择
-    #   mobilenet
-    #   inception_resnetv1
+    #   mobilenet、inception_resnetv1
     #--------------------------------------#
-    backbone = "mobilenet"
-    input_shape = [160,160,3]
+    backbone    = "mobilenet"
+    #--------------------------------------------------------#
+    #   输入图像大小，常用设置如[112, 112, 3]
+    #--------------------------------------------------------#
+    input_shape = [160, 160, 3]
     #--------------------------------------#
     #   训练好的权值文件
     #--------------------------------------#
-    model_path = "model_data/facenet_mobilenet.h5"
+    model_path  = "model_data/facenet_mobilenet.h5"
 
-    batch_size = 256
-    log_interval = 1
+    #--------------------------------------#
+    #   评估的批次大小和记录间隔
+    #--------------------------------------#
+    batch_size      = 256
+    log_interval    = 1
 
-    test_loader = LFWDataset(dir="./lfw",pairs_path="model_data/lfw_pair.txt", batch_size=batch_size, image_size=input_shape)
+    test_loader = LFWDataset(dir="./lfw",pairs_path="model_data/lfw_pair.txt", batch_size=batch_size, input_shape=input_shape)
 
-    model = facenet(input_shape, backbone=backbone,mode="predict")
+    model = facenet(input_shape, backbone=backbone, mode="predict")
     model.load_weights(model_path,by_name=True)
 
     test(test_loader, model)

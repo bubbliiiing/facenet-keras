@@ -2,8 +2,8 @@ from functools import partial
 
 from keras import backend as K
 from keras.layers import (Activation, BatchNormalization, Concatenate, Conv2D,
-                          Dense, Dropout, GlobalAveragePooling2D, Input,
-                          Lambda, MaxPooling2D, add)
+                          Dense, Dropout, GlobalAveragePooling2D, Lambda,
+                          MaxPooling2D, add)
 from keras.models import Model
 
 
