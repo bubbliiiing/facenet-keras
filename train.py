@@ -149,6 +149,12 @@ if __name__ == "__main__":
         Lr              = 1e-3
         Init_epoch      = 0
         Freeze_epoch    = 50
+            
+        epoch_step      = num_train // Batch_size
+        epoch_step_val  = num_val // Batch_size
+
+        if epoch_step == 0 or epoch_step_val == 0:
+            raise ValueError('数据集过小，无法进行训练，请扩充数据集。')
         
         model.compile(
             loss={'Embedding' : triplet_loss(batch_size=Batch_size), 'Softmax' : 'categorical_crossentropy'}, 
@@ -158,12 +164,6 @@ if __name__ == "__main__":
 
         train_dataset = FacenetDataset(input_shape, lines[:num_train], num_train, num_classes, Batch_size)
         val_dataset   = FacenetDataset(input_shape, lines[num_train:], num_val, num_classes, Batch_size)
-            
-        epoch_step      = num_train // Batch_size
-        epoch_step_val  = num_val // Batch_size
-
-        if epoch_step == 0 or epoch_step_val == 0:
-            raise ValueError('数据集过小，无法进行训练，请扩充数据集。')
 
         model.fit_generator(
             generator           = train_dataset,
@@ -191,6 +191,12 @@ if __name__ == "__main__":
         Lr              = 1e-4
         Freeze_epoch    = 50
         Epoch           = 100
+            
+        epoch_step      = num_train // Batch_size
+        epoch_step_val  = num_val // Batch_size
+
+        if epoch_step == 0 or epoch_step_val == 0:
+            raise ValueError('数据集过小，无法进行训练，请扩充数据集。')
         
         model.compile(
             loss={'Embedding' : triplet_loss(batch_size=Batch_size), 'Softmax' : 'categorical_crossentropy'}, 
@@ -200,12 +206,6 @@ if __name__ == "__main__":
 
         train_dataset = FacenetDataset(input_shape, lines[:num_train], num_train, num_classes, Batch_size)
         val_dataset   = FacenetDataset(input_shape, lines[num_train:], num_val, num_classes, Batch_size)
-            
-        epoch_step      = num_train // Batch_size
-        epoch_step_val  = num_val // Batch_size
-
-        if epoch_step == 0 or epoch_step_val == 0:
-            raise ValueError('数据集过小，无法进行训练，请扩充数据集。')
 
         model.fit_generator(
             generator           = train_dataset,
