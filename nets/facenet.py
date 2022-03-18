@@ -23,10 +23,10 @@ def facenet(input_shape, num_classes = None, backbone = "mobilenet", mode = "tra
         #   训练的话利用交叉熵和triplet_loss
         #   结合一起训练
         #--------------------------------------------#
-        logits          = Dense(num_classes)(model.output)
-        softmax         = Activation("softmax", name = "Softmax")(logits)
-        
         normalize       = Lambda(lambda  x: K.l2_normalize(x, axis=1), name="Embedding")(model.output)
+        
+        logits          = Dense(num_classes)(normalize)
+        softmax         = Activation("softmax", name = "Softmax")(logits)
         combine_model   = Model(inputs, [softmax, normalize])
         return combine_model
     elif mode == "predict":
