@@ -22,10 +22,10 @@ keras==2.1.5
 
 ## 文件下载
 已经训练好的facenet_mobilenet.h5和facenet_inception_resnetv1.h5可以在百度网盘下载。    
-链接: https://pan.baidu.com/s/19tUjcBtC_5VlBqktFG_z0w 提取码: iq26  
+链接: https://pan.baidu.com/s/1XzwLpU3zPFW7QK045UDgkQ 提取码: 596k     
 
 训练用的CASIA-WebFaces数据集以及评估用的LFW数据集可以在百度网盘下载。    
-链接: https://pan.baidu.com/s/1fhiHlylAFVoR43yfDbi4Ag 提取码: gkch    
+链接: https://pan.baidu.com/s/1qMxFR8H_ih0xmY-rKgRejw 提取码: bcrq    
 
 ## 预测步骤
 ### a、使用预训练权重
