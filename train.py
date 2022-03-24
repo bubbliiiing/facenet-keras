@@ -141,6 +141,8 @@ if __name__ == "__main__":
             layer.add_loss(l2(weight_decay)(layer.alpha))
             
     if True:
+        if batch_size % 3 != 0:
+            raise ValueError("Batch_size must be the multiple of 3.")
         #-------------------------------------------------------------------#
         #   判断当前batch_size与64的差别，自适应调整学习率
         #-------------------------------------------------------------------#
