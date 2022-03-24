@@ -14,9 +14,7 @@ from utils.callbacks import ExponentDecayScheduler, LFW_callback, LossHistory
 from utils.dataloader import FacenetDataset, LFWDataset
 from utils.utils import get_num_classes
 
-import tensorflow as tf
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.7)
-sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) 
+
 if __name__ == "__main__":
     #--------------------------------------------------------#
     #   指向根目录下的cls_train.txt，读取人脸路径与标签
