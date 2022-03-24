@@ -13,7 +13,10 @@
 9. [参考资料 Reference](#Reference)
 
 ## Top News
-**`2022-03`**:**创建仓库，支持不同模型训练,支持大量可调整参数，支持step、cos学习率下降法、支持adam、sgd优化器选择、支持学习率根据batch_size自适应调整、新增图片裁剪。**  
+**`2022-03`**:**进行了大幅度的更新，支持step、cos学习率下降法、支持adam、sgd优化器选择、支持学习率根据batch_size自适应调整。**  
+BiliBili视频中的原仓库地址为：https://github.com/bubbliiiing/facenet-keras/tree/bilibili
+
+**`2021-02`**:**创建仓库，支持模型训练，大量的注释，多个可调整参数，lfw数据集评估等。**  
 
 ## 相关仓库
 | 模型 | 路径 |
