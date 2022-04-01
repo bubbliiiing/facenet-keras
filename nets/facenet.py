@@ -12,9 +12,9 @@ def facenet(input_shape, num_classes = None, backbone = "mobilenet", mode = "tra
     #   利用主干网络进行特征提取
     #--------------------------------------------#
     if backbone=="mobilenet":
-        model = MobileNet(inputs, dropout_keep_prob = 0.4)
+        model = MobileNet(inputs, dropout_keep_prob = 0.5)
     elif backbone=="inception_resnetv1":
-        model = InceptionResNetV1(inputs, dropout_keep_prob = 0.4)
+        model = InceptionResNetV1(inputs, dropout_keep_prob = 0.5)
     else:
         raise ValueError('Unsupported backbone - `{}`, Use mobilenet, inception_resnetv1.'.format(backbone))
 
