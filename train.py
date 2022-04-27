@@ -7,15 +7,23 @@ from keras.callbacks import (EarlyStopping, LearningRateScheduler,
 from keras.layers import Conv2D, Dense, DepthwiseConv2D, PReLU
 from keras.optimizers import SGD, Adam
 from keras.regularizers import l2
+from keras.utils.multi_gpu_utils import multi_gpu_model
 
 from nets.facenet import facenet
 from nets.facenet_training import get_lr_scheduler, triplet_loss
-from utils.callbacks import ExponentDecayScheduler, LFW_callback, LossHistory
+from utils.callbacks import (ExponentDecayScheduler, LFW_callback, LossHistory,
+                             ParallelModelCheckpoint)
 from utils.dataloader import FacenetDataset, LFWDataset
 from utils.utils import get_num_classes
 
 
 if __name__ == "__main__":
+    #---------------------------------------------------------------------#
+    #   train_gpu   训练用到的GPU
+    #               默认为第一张卡、双卡为[0, 1]、三卡为[0, 1, 2]
+    #               在使用多GPU时，每个卡上的batch为总batch除以卡的数量。
+    #---------------------------------------------------------------------#
+    train_gpu       = [0,]
     #--------------------------------------------------------#
     #   指向根目录下的cls_train.txt，读取人脸路径与标签
     #--------------------------------------------------------#
@@ -54,9 +62,9 @@ if __name__ == "__main__":
     #   在此提供若干参数设置建议，各位训练者根据自己的需求进行灵活调整：
     #   （一）从预训练权重开始训练：
     #       Adam：
-    #           Init_Epoch = 0，Freeze_Epoch = 50，UnFreeze_Epoch = 100，optimizer_type = 'adam'，Init_lr = 1e-3，weight_decay = 0。
+    #           Init_Epoch = 0，Epoch = 100，optimizer_type = 'adam'，Init_lr = 1e-3，weight_decay = 0。
     #       SGD：
-    #           Init_Epoch = 0，Freeze_Epoch = 50，UnFreeze_Epoch = 100，optimizer_type = 'sgd'，Init_lr = 1e-2，weight_decay = 5e-4。
+    #           Init_Epoch = 0，Epoch = 100，optimizer_type = 'sgd'，Init_lr = 1e-2，weight_decay = 5e-4。
     #       其中：UnFreeze_Epoch可以在100-300之间调整。
     #   （二）batch_size的设置：
     #       在显卡能够接受的范围内，以大为好。显存不足与数据集大小无关，提示显存不足（OOM或者CUDA out of memory）请调小batch_size。
@@ -66,14 +74,14 @@ if __name__ == "__main__":
     #------------------------------------------------------#
     #   训练参数
     #   Init_Epoch      模型当前开始的训练世代
+    #   Epoch           模型总共训练的epoch
     #   batch_size      每次输入的图片数量
     #                   受到数据加载方式与triplet loss的影响
     #                   batch_size需要为3的倍数
-    #   Epoch           模型总共训练的epoch
     #------------------------------------------------------#
-    batch_size      = 96
     Init_Epoch      = 0
     Epoch           = 100
+    batch_size      = 96
 
     #------------------------------------------------------------------#
     #   其它训练参数：学习率、优化器、学习率下降有关
@@ -123,16 +131,29 @@ if __name__ == "__main__":
     lfw_dir_path    = "lfw"
     lfw_pairs_path  = "model_data/lfw_pair.txt"
 
+    #------------------------------------------------------#
+    #   设置用到的显卡
+    #------------------------------------------------------#
+    os.environ["CUDA_VISIBLE_DEVICES"]  = ','.join(str(x) for x in train_gpu)
+    ngpus_per_node                      = len(train_gpu)
+    print('Number of devices: {}'.format(ngpus_per_node))
+
     num_classes = get_num_classes(annotation_path)
     #---------------------------------#
     #   载入模型并加载预训练权重
     #---------------------------------#
-    model = facenet(input_shape, num_classes, backbone=backbone, mode="train")
+    model_body = facenet(input_shape, num_classes, backbone=backbone, mode="train")
     if model_path != '':
-        #---------------------------------#
+        #------------------------------------------------------#
         #   载入预训练权重
-        #---------------------------------#
-        model.load_weights(model_path, by_name=True, skip_mismatch=True)
+        #------------------------------------------------------#
+        print('Load weights {}.'.format(model_path))
+        model_body.load_weights(model_path, by_name=True, skip_mismatch=True)
+        
+    if ngpus_per_node > 1:
+        model   = multi_gpu_model(model_body, gpus=ngpus_per_node)
+    else:
+        model   = model_body
     #-------------------------------------------------------#
     #   0.01用于验证，0.99用于训练
     #-------------------------------------------------------#
@@ -198,8 +219,12 @@ if __name__ == "__main__":
         log_dir         = os.path.join(save_dir, "loss_" + str(time_str))
         logging         = TensorBoard(log_dir)
         loss_history    = LossHistory(log_dir)
-        checkpoint      = ModelCheckpoint(os.path.join(save_dir, "ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}.h5"), 
-                                monitor = 'val_loss', save_weights_only = True, save_best_only = False, period = save_period)
+        if ngpus_per_node > 1:
+            checkpoint      = ParallelModelCheckpoint(model_body, os.path.join(save_dir, "ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}.h5"), 
+                                    monitor = 'val_loss', save_weights_only = True, save_best_only = False, period = save_period)
+        else:
+            checkpoint      = ModelCheckpoint(os.path.join(save_dir, "ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}.h5"), 
+                                    monitor = 'val_loss', save_weights_only = True, save_best_only = False, period = save_period)
         early_stopping  = EarlyStopping(monitor='val_loss', min_delta = 0, patience = 10, verbose = 1)
         lr_scheduler    = LearningRateScheduler(lr_scheduler_func, verbose = 1)
         #---------------------------------#
