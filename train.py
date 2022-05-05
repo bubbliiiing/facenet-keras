@@ -2,6 +2,7 @@ import datetime
 import os
 
 import numpy as np
+import tensorflow as tf
 from keras.callbacks import (EarlyStopping, LearningRateScheduler,
                              ModelCheckpoint, TensorBoard)
 from keras.layers import Conv2D, Dense, DepthwiseConv2D, PReLU
@@ -14,8 +15,9 @@ from nets.facenet_training import get_lr_scheduler, triplet_loss
 from utils.callbacks import (ExponentDecayScheduler, LFW_callback, LossHistory,
                              ParallelModelCheckpoint)
 from utils.dataloader import FacenetDataset, LFWDataset
-from utils.utils import get_num_classes
+from utils.utils import get_num_classes, show_config
 
+tf.logging.set_verbosity(tf.logging.ERROR)
 
 if __name__ == "__main__":
     #---------------------------------------------------------------------#
@@ -69,7 +71,6 @@ if __name__ == "__main__":
     #   （二）batch_size的设置：
     #       在显卡能够接受的范围内，以大为好。显存不足与数据集大小无关，提示显存不足（OOM或者CUDA out of memory）请调小batch_size。
     #       受到BatchNorm层影响，batch_size最小为2，不能为1。
-    #       正常情况下Freeze_batch_size建议为Unfreeze_batch_size的1-2倍。不建议设置的差距过大，因为关系到学习率的自动调整。
     #----------------------------------------------------------------------------------------------------------------------------#
     #------------------------------------------------------#
     #   训练参数
@@ -165,6 +166,13 @@ if __name__ == "__main__":
     np.random.seed(None)
     num_val = int(len(lines)*val_split)
     num_train = len(lines) - num_val
+    
+    show_config(
+        num_classes = num_classes, backbone = backbone, model_path = model_path, input_shape = input_shape, \
+        Init_Epoch = Init_Epoch, Epoch = Epoch, batch_size = batch_size, \
+        Init_lr = Init_lr, Min_lr = Min_lr, optimizer_type = optimizer_type, momentum = momentum, lr_decay_type = lr_decay_type, \
+        save_period = save_period, save_dir = save_dir, num_workers = num_workers, num_train = num_train, num_val = num_val
+    )
 
     for layer in model.layers:
         if isinstance(layer, DepthwiseConv2D):

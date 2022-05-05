@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 
 from nets.facenet import facenet
-from utils.utils import preprocess_input, resize_image
+from utils.utils import preprocess_input, resize_image, show_config
 
 
 #--------------------------------------------#
@@ -50,6 +50,8 @@ class Facenet(object):
             setattr(self, name, value)
             
         self.generate()
+        
+        show_config(**self._defaults)
         
     #---------------------------------------------------#
     #   载入模型
